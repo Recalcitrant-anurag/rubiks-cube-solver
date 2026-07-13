@@ -25,8 +25,7 @@ class RubiksCube {
     };
     /*
         getColor function returns the color of the face with (row,col)
-        if Rubik's cube face is pointing at me then the row numbering starts from
-        top to bottom and the col numbering starts from left to right with them being
+        if Rubik's cube face is pointing at me then the row numbering starts from top to bottom and the col numbering starts from left to right with them being
         0-indexed
      */
     virtual COLOR getColor(FACE face,unsigned row,unsigned col) const=0;
