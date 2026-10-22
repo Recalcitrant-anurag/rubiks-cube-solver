@@ -1,17 +1,16 @@
 #include <iostream>
 #include <vector>
 #include "Model/RubiksCubeBitboard.h"
-#include "Solver/DFSSolver.h"
+#include "Solver/IDDFSSolver.h"
 
 using namespace std;
 
 int main() {
     RubiksCubeBitboard cube;
-
-    // 1. Scramble the cube with 6 moves
-    cout << "Scrambling the cube with 6 moves..." << endl;
-    vector<RubiksCube::MOVE> shuffle_moves = cube.randomShuffleCube(6);
-
+    
+    cout << "Scrambling the cube with 7 moves..." << endl;
+    vector<RubiksCube::MOVE> shuffle_moves = cube.randomShuffleCube(7);
+    
     cout << "Scramble sequence generated: ";
     for (auto move : shuffle_moves) {
         cout << cube.getMove(move) << " ";
@@ -19,19 +18,23 @@ int main() {
     cout << "\n\nScrambled Cube State:" << endl;
     cube.print();
 
-    // 2. Initialize the DFS Solver with a maximum depth of 8 moves
-    cout << "\nStarting DFS Solver..." << endl;
-    DFSSolver<RubiksCubeBitboard, HashBitboard> dfsSolver(cube, 8);
+    // Set limit to 8 to guarantee we can find a 7-move scramble
+    int max_depth = 8;
+    cout << "\nStarting IDDFS Solver (Max Depth: " << max_depth << ")..." << endl;
+    
+    IDDFSSolver<RubiksCubeBitboard, HashBitboard> iddfsSolver(cube, max_depth);
+    vector<RubiksCube::MOVE> solution = iddfsSolver.solve();
 
-    // 3. Solve the cube
-    vector<RubiksCube::MOVE> solution = dfsSolver.solve();
-
-    // 4. Print the solution sequence
-    cout << "\nSolution found! Sequence to solve: ";
-    for (auto move : solution) {
-        cout << cube.getMove(move) << " ";
+    // Safety check for empty solutions
+    if (solution.empty()) {
+        cout << "\n[!] No solution found. The cube requires more than " << max_depth << " moves to solve." << endl;
+    } else {
+        cout << "\nSolution found! Sequence to solve: ";
+        for (auto move : solution) {
+            cout << cube.getMove(move) << " ";
+        }
+        cout << endl;
     }
-    cout << endl;
 
     return 0;
 }
