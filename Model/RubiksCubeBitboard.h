@@ -21,6 +21,13 @@ public:
             }
         }
     }
+    // for equality operator in BFSSolver
+    bool operator==(const RubiksCubeBitboard &r1) const {
+        for (int i = 0; i < 6; i++) {
+            if (cube[i] != r1.cube[i]) return false;
+        }
+        return true;
+    }
     COLOR getColor(FACE face,unsigned row,unsigned col) const override {
         if (row==1 && col==1)return COLOR(int(face));
         int bit_asked=0;
@@ -225,5 +232,17 @@ public:
         this->b();
         this->b();
         return *this;
+    }
+};
+//This is the H that BFSSolver template is asking for.
+//It XORs all 6 faces together to generate a single, unique memory ID for the map.
+struct HashBitboard {
+    size_t operator()(const RubiksCubeBitboard &r1) const {
+        uint64_t final_hash = r1.cube[0];
+        for (int i = 1; i < 6; i++) {
+            // Golden ratio shift prevents symmetrical hash collisions
+            final_hash ^= r1.cube[i] + 0x9e3779b9 + (final_hash << 6) + (final_hash >> 2);
+        }
+        return final_hash;
     }
 };

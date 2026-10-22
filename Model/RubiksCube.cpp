@@ -15,6 +15,7 @@ char RubiksCube::getColorLetter(COLOR color){
         case COLOR::RED:
             return 'R';
     }
+    return ' ';
 }
 /*to get the move name in a string format*/
 string RubiksCube::getMove(MOVE mov){
@@ -56,6 +57,7 @@ string RubiksCube::getMove(MOVE mov){
         case MOVE::D2:
             return "D2";
     }
+    return "";
 }
 void RubiksCube::print() const{
     cout<<"Rubik's Cube \n\n";
@@ -106,46 +108,30 @@ RubiksCube& RubiksCube::move(MOVE mov){
         case MOVE::DPRIME:
             return this->dprime();
     }
+    return *this;
 }
-RubiksCube& RubiksCube::invert(MOVE mov){
-    switch(mov){
-        case MOVE::L:
-            return this->l2();
-        case MOVE::L2:
-            return this->l();
-        case MOVE::LPRIME:
-            return this->lprime();
-        case MOVE::R:
-            return this->r2();
-        case MOVE::R2:
-            return this->r();
-        case MOVE::RPRIME:
-            return this->rprime();
-        case MOVE::U:
-            return this->u2();
-        case MOVE::U2:
-            return this->u();
-        case MOVE::UPRIME:
-            return this->uprime();
-        case MOVE::F:
-            return this->f2();
-        case MOVE::F2:
-            return this->f();
-        case MOVE::FPRIME:
-            return this->fprime();
-        case MOVE::B:
-            return this->b2();
-        case MOVE::B2:
-            return this->b();
-        case MOVE::BPRIME:
-            return this->bprime();
-        case MOVE::D:
-            return this->d2();
-        case MOVE::D2:
-            return this->d();
-        case MOVE::DPRIME:
-            return this->dprime();
+RubiksCube& RubiksCube::invert(MOVE ind) {
+    switch (ind) {
+        case MOVE::L: return this->lprime();
+        case MOVE::LPRIME: return this->l();
+        case MOVE::L2: return this->l2();
+        case MOVE::R: return this->rprime();
+        case MOVE::RPRIME: return this->r();
+        case MOVE::R2: return this->r2();
+        case MOVE::U: return this->uprime();
+        case MOVE::UPRIME: return this->u();
+        case MOVE::U2: return this->u2();
+        case MOVE::D: return this->dprime();
+        case MOVE::DPRIME: return this->d();
+        case MOVE::D2: return this->d2();
+        case MOVE::F: return this->fprime();
+        case MOVE::FPRIME: return this->f();
+        case MOVE::F2: return this->f2();
+        case MOVE::B: return this->bprime();
+        case MOVE::BPRIME: return this->b();
+        case MOVE::B2: return this->b2();
     }
+    return *this;
 }
 vector<RubiksCube::MOVE> RubiksCube::randomShuffleCube(unsigned times){
     vector<MOVE>moves_performed;
