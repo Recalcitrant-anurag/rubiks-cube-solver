@@ -1,0 +1,11 @@
+# Ignore database files
+*.bin
+
+# Ignore compiled executables
+*.exe
+
+# Ignore CLion IDE configuration
+.idea/
+
+# Ignore CMake build directory
+cmake-build-debug/

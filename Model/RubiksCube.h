@@ -91,6 +91,14 @@ class RubiksCube {
     RubiksCube& move(MOVE mov);
     /*to invert a move */
     RubiksCube& invert(MOVE mov);
+
+
+    /* Returns an array of 8 corner positions */
+    virtual vector<uint8_t> getCornerPositions() const = 0;
+    /* Returns an array of 8 corner orientations */
+    virtual vector<uint8_t> getCornerOrientations() const = 0;
+
+
     /*making function for all the moves possible for a rubik cube */
     virtual RubiksCube& f()=0;
     virtual RubiksCube& f2()=0;

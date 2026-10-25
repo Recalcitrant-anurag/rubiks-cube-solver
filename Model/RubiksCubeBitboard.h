@@ -1,6 +1,11 @@
 //
 // Created by Anurag Anand on 14-07-2026.
 //
+// Created by Anurag Anand on 14-07-2026.
+#ifndef RUBIKS_CUBE_BITBOARD_H
+#define RUBIKS_CUBE_BITBOARD_H
+
+
 #include "RubiksCube.h"
 class RubiksCubeBitboard : public RubiksCube {
 private:
@@ -8,6 +13,29 @@ private:
     // of writing 1111 1111 meaning 8 bits of 1
     void rotateface(int face){
         cube[face]=(cube[face]<<16)|(cube[face]>>48);
+    }
+    // Helper 1: Identifies exactly which corner piece is in a specific slot using a unique color bitmask
+    uint8_t getCornerIndex(uint8_t c1, uint8_t c2, uint8_t c3) const {
+        uint8_t bitmask = (1 << c1) | (1 << c2) | (1 << c3);
+        switch (bitmask) {
+            case 19: return 0; // U-L-B (White, Green, Orange)
+            case 25: return 1; // U-B-R (White, Orange, Blue)
+            case 13: return 2; // U-R-F (White, Blue, Red)
+            case 7:  return 3; // U-F-L (White, Red, Green)
+            case 38: return 4; // D-L-F (Yellow, Green, Red)
+            case 44: return 5; // D-F-R (Yellow, Red, Blue)
+            case 56: return 6; // D-R-B (Yellow, Blue, Orange)
+            case 50: return 7; // D-B-L (Yellow, Orange, Green)
+        }
+        return 0;
+    }
+
+    // Helper 2: Identifies how the corner is twisted (0, 1, or 2)
+    uint8_t getCornerOrientation(uint8_t c1, uint8_t c2, uint8_t c3) const {
+        if (c1 == 0 || c1 == 5) return 0; // White/Yellow is on the Top/Bottom face (Solved orientation)
+        if (c2 == 0 || c2 == 5) return 1; // White/Yellow is twisted clockwise
+        if (c3 == 0 || c3 == 5) return 2; // White/Yellow is twisted counter-clockwise
+        return 0;
     }
 public:
     uint64_t cube[6]{};
@@ -233,6 +261,35 @@ public:
         this->b();
         return *this;
     }
+    // ---------------- CORNER PATTERN DATABASE EXTRACTION ----------------
+
+    vector<uint8_t> getCornerPositions() const override {
+        vector<uint8_t> ret(8);
+        ret[0] = getCornerIndex((int)getColor(FACE::UP, 0, 0), (int)getColor(FACE::LEFT, 0, 0), (int)getColor(FACE::BACK, 0, 2));
+        ret[1] = getCornerIndex((int)getColor(FACE::UP, 0, 2), (int)getColor(FACE::BACK, 0, 0), (int)getColor(FACE::RIGHT, 0, 2));
+        ret[2] = getCornerIndex((int)getColor(FACE::UP, 2, 2), (int)getColor(FACE::RIGHT, 0, 0), (int)getColor(FACE::FRONT, 0, 2));
+        ret[3] = getCornerIndex((int)getColor(FACE::UP, 2, 0), (int)getColor(FACE::FRONT, 0, 0), (int)getColor(FACE::LEFT, 0, 2));
+
+        ret[4] = getCornerIndex((int)getColor(FACE::DOWN, 0, 0), (int)getColor(FACE::LEFT, 2, 2), (int)getColor(FACE::FRONT, 2, 0));
+        ret[5] = getCornerIndex((int)getColor(FACE::DOWN, 0, 2), (int)getColor(FACE::FRONT, 2, 2), (int)getColor(FACE::RIGHT, 2, 0));
+        ret[6] = getCornerIndex((int)getColor(FACE::DOWN, 2, 2), (int)getColor(FACE::RIGHT, 2, 2), (int)getColor(FACE::BACK, 2, 0));
+        ret[7] = getCornerIndex((int)getColor(FACE::DOWN, 2, 0), (int)getColor(FACE::BACK, 2, 2), (int)getColor(FACE::LEFT, 2, 0));
+        return ret;
+    }
+
+    vector<uint8_t> getCornerOrientations() const override {
+        vector<uint8_t> ret(8);
+        ret[0] = getCornerOrientation((int)getColor(FACE::UP, 0, 0), (int)getColor(FACE::LEFT, 0, 0), (int)getColor(FACE::BACK, 0, 2));
+        ret[1] = getCornerOrientation((int)getColor(FACE::UP, 0, 2), (int)getColor(FACE::BACK, 0, 0), (int)getColor(FACE::RIGHT, 0, 2));
+        ret[2] = getCornerOrientation((int)getColor(FACE::UP, 2, 2), (int)getColor(FACE::RIGHT, 0, 0), (int)getColor(FACE::FRONT, 0, 2));
+        ret[3] = getCornerOrientation((int)getColor(FACE::UP, 2, 0), (int)getColor(FACE::FRONT, 0, 0), (int)getColor(FACE::LEFT, 0, 2));
+
+        ret[4] = getCornerOrientation((int)getColor(FACE::DOWN, 0, 0), (int)getColor(FACE::LEFT, 2, 2), (int)getColor(FACE::FRONT, 2, 0));
+        ret[5] = getCornerOrientation((int)getColor(FACE::DOWN, 0, 2), (int)getColor(FACE::FRONT, 2, 2), (int)getColor(FACE::RIGHT, 2, 0));
+        ret[6] = getCornerOrientation((int)getColor(FACE::DOWN, 2, 2), (int)getColor(FACE::RIGHT, 2, 2), (int)getColor(FACE::BACK, 2, 0));
+        ret[7] = getCornerOrientation((int)getColor(FACE::DOWN, 2, 0), (int)getColor(FACE::BACK, 2, 2), (int)getColor(FACE::LEFT, 2, 0));
+        return ret;
+    }
 };
 //This is the H that BFSSolver template is asking for.
 //It XORs all 6 faces together to generate a single, unique memory ID for the map.
@@ -246,3 +303,4 @@ struct HashBitboard {
         return final_hash;
     }
 };
+#endif // RUBIKS_CUBE_BITBOARD_H
